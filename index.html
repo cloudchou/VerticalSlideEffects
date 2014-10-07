@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="/jquery.min.js"></script>
+<style type="text/css">
+body {
+	font: 14px/21px Microsoft YaHei, Tahoma, Arial;
+	display: block;
+	cursor: default;
+	color: #444;
+	-webkit-font-smoothing: antialiased;
+	background-color: #eceef0;
+}
+</style>
+<script type="text/javascript">
+	//**********************  Start with disable/enable scroll function  **********************
+	// left: 37, up: 38, right: 39, down: 40,
+	// spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
+
+	var keys = [ 37, 38, 39, 40 ];
+
+	function preventDefault(e) {
+		e = e || window.event;
+		if (e.preventDefault)
+			e.preventDefault();
+		e.returnValue = false;
+	}
+
+	function keydown(e) {
+		for ( var i = keys.length; i--;) {
+			if (e.keyCode === keys[i]) {
+				preventDefault(e);
+				return;
+			}
+		}
+	}
+
+	function wheel(e) {
+		preventDefault(e);
+	}
+
+	function disable_scroll() {
+		if (window.addEventListener) {
+			window.addEventListener('DOMMouseScroll', wheel, false);
+		}
+		window.onmousewheel = document.onmousewheel = wheel;
+		document.onkeydown = keydown;
+	}
+
+	function enable_scroll() {
+		if (window.removeEventListener) {
+			window.removeEventListener('DOMMouseScroll', wheel, false);
+		}
+		window.onmousewheel = document.onmousewheel = document.onkeydown = null;
+	}
+</script>
+<script type="text/javascript">
+	$(document).ready(
+			function() {
+				var scrollTop = 0;
+				var animateCounter = 0;
+				var height = $("#wrap").height();
+				var scrollStep = Math.floor(height / 4); 
+				function myScrollCallback(event) {
+					disable_scroll();
+					$(window).unbind("scroll",myScrollCallback); 
+					var currentScrollTop = $("body").scrollTop();
+					console.log("try to animiate currentScrllTop"
+							+ currentScrollTop + " scrollTop:" + scrollTop);
+					if (currentScrollTop < scrollTop) {//页面往上滚			
+						var nextScrollTop = scrollTop - scrollStep;
+						console.log("scroll up nextScropTop:" + nextScrollTop);
+						if (nextScrollTop < 0)
+							nextScrollTop = 0;
+						$('body').animate({
+							scrollTop : nextScrollTop,
+							queue : true
+						}, 800, function() {
+							scrollTop = nextScrollTop;
+							enable_scroll();
+							$(window).bind("scroll",myScrollCallback);
+							console.log("animate end scrollTop:" + scrollTop);
+						});
+					} else if (currentScrollTop > scrollTop) {//页面往下滚 
+						var nextScrollTop = scrollTop + scrollStep;
+						console.log("scroll down nextScrollTop:"
+								+ nextScrollTop + "scrollStep:" + scrollStep);
+						if (nextScrollTop > height)
+							nextScrollTop = height;
+						$('body').animate({
+							scrollTop : nextScrollTop,
+							queue : true
+						}, 800, function() {
+							scrollTop = nextScrollTop;
+							enable_scroll();
+							$(window).bind("scroll",myScrollCallback);
+							console.log("animate end scrollTop:" + scrollTop);
+						});
+					} else {
+						enable_scroll();
+						$(window).bind("scroll",myScrollCallback);
+					}
+				}
+				
+				$(window).bind("scroll",myScrollCallback);
+			});
+</script>
+</head>
+<body>
+	<div id="wrap"
+		style="width: 980px; margin: 0 auto; height: 3200px; border: 1px solid red;">
+		<div id="content1" style="height: 25%">
+			<h2>Hello world</h2>
+		</div>
+		<div id="content2" style="height: 25%">
+			<h2>Hello world</h2>
+		</div>
+		<div id="content3" style="height: 25%">
+			<h2>Hello world</h2>
+			<a href="#test">totop</a>
+		</div>
+		<div id="content4" style="height: 25%">
+			<h2>Hello world</h2>
+			<a href="#test">totop</a>
+		</div>
+	</div>
+</body>
+</html>
